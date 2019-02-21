@@ -169,10 +169,10 @@ if __name__ == '__main__':
     print("Starting in ", wait )
     time.sleep(wait)
     while True:
-        #try:
+        try:
             main(client)
-            wait = 180 #  5 * 60 = 300 => 300 * 3 = 15min       180 = 3*60   
+            wait = 180 # 3 min   
             print("Waiting for ", wait )
             time.sleep(wait)
-        #except:
+        except:
             time.sleep(30)
