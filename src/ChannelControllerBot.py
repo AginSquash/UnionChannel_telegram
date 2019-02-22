@@ -48,18 +48,27 @@ def ChangeEnableAds():
 
     if ads["enable"] == 1:
         ads["enable"] = 0
-        ads_block_status = False
+        ads_block_status = "disabled"
     else:
         ads["enable"] = 1
-        ads_block_status = True
+        ads_block_status = "enabled"
 
     sf.SaveJson(name= "ads", data=ads)
 
     return ads_block_status
 
 
-#def GetAdsRuleList():
+def GetAdsRuleList():
+    ads = sf.OpenJson(name= "ads")
+    if ads["enable"] == 0:
+        list_of_channels = "WARNING!\nAdBlock disabled\n"
+    else:
+        list_of_channels = ""
+    for ad in ads:
+        if ad != "enable":
+            list_of_channels = list_of_channels + str(ad) + "\n"
 
+    return list_of_channels
 
 
 def handle(msg):
@@ -80,10 +89,7 @@ def handle(msg):
 
             elif (command[0].lower() == '/setads' or command[0].lower() == '/setads@' + bot_username.lower()):
                 ads_block_status = ChangeEnableAds()
-                if (ads_block_status == True):
-                    bot.sendMessage(chat_id, "AdBlock enabled")
-                else:
-                    bot.sendMessage(chat_id, "AdBlock disabled")
+                bot.sendMessage(chat_id, "AdBlock %s" %ads_block_status)
 
             else:
                 bot.sendMessage(chat_id, "Incorrect input")
