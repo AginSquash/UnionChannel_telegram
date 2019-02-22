@@ -28,3 +28,12 @@ Subscribe to the channels in the telegrams is not required.
       channel_id = -XXXXXXXXXX
 
 + On first start you must enter phone-number and password from telegram-account. Telethon requried.
+## Some bot commands
+
+    /add - Add channel
+    /del - Delete channel
+    /channels - Channels List
+    /addrule - Add rule
+    /delrule - Delete rule
+    /setads - Enable/Disable AdBlock
+    /rules - List of AdBlock rules
