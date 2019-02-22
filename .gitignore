@@ -2,8 +2,6 @@ __pycache__/
 
 .vscode/
 
-config.py
-
 *.session
 *.session-journal
 
