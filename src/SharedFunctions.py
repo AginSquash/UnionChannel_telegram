@@ -7,4 +7,4 @@ def OpenJson(name):
 
 def SaveJson(name, data):
     with open('data/%s.json' % name , 'w') as f:
-                json.dump(data, f) #, ensure_ascii=False)
+                json.dump(data, f)
