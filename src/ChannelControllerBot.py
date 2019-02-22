@@ -70,6 +70,10 @@ def GetAdsRuleList():
 
     return list_of_channels
 
+def AddRuleToList(rule):
+    ads = sf.OpenJson("ads")
+    ads[rule] = 0
+    sf.SaveJson("ads", ads)
 
 def handle(msg):
     bot_username = bot.getMe()["username"]
@@ -78,7 +82,7 @@ def handle(msg):
     print("Msg from %s " % chat_id) #Channel id has "-". Keep it add to 
 
     if ( (config.admin_chat_id == None and config.channel_id == None) or chat_id == config.admin_chat_id or chat_id == config.channel_id):
-        command = msg['text']
+        command = msg['text'].lower()
 
         command = command.split(" ")
 
@@ -87,7 +91,7 @@ def handle(msg):
                 list_of_channels = "Channels followed:\n\n" +  GetChannels()
                 bot.sendMessage(chat_id, list_of_channels)
 
-            elif (command[0].lower() == '/setads' or command[0].lower() == '/setads@' + bot_username.lower()):
+            elif (command[0] == '/setads' or command[0] == '/setads@' + bot_username):
                 ads_block_status = ChangeEnableAds()
                 bot.sendMessage(chat_id, "AdBlock %s" %ads_block_status)
 
@@ -108,6 +112,13 @@ def handle(msg):
                     bot.sendMessage(chat_id, "Successful delete %s" % command[1])
                 else:
                     bot.sendMessage(chat_id, "Channel %s allready unfollowed" % command[1])
+
+            elif command[0] == '/addrule':
+                    AddRuleToList( command[1].lower() )
+                    bot.sendMessage(chat_id, "Successful add %s" % command[1])
+
+            
+
 
     else:
         print(chat_id)
