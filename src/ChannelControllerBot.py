@@ -43,17 +43,21 @@ def GetChannels():
 
     return list_of_channels
 
-def SetEnableAds(isEnable):
+def ChangeEnableAds():
     with open('data/ads.json', 'r') as f:
             ads = json.load(f)
-            
-    if isEnable == True:
-        ads["enable"] = 1
-    else:
+
+    if ads["enable"] == 1:
         ads["enable"] = 0
+        ads_block_status = False
+    else:
+        ads["enable"] = 1
+        ads_block_status = True
 
     with open('data/ads.json', 'w') as f:
                 json.dump(ads, f)
+
+    return ads_block_status
 
 def handle(msg):
     bot_username = bot.getMe()["username"]
@@ -70,6 +74,14 @@ def handle(msg):
             if (command[0] == '/channels' or command[0] == '/channels@' + bot_username):
                 list_of_channels = "Channels followed:\n\n" +  GetChannels()
                 bot.sendMessage(chat_id, list_of_channels)
+
+            elif (command[0].lower() == '/setads' or command[0].lower() == '/setads@' + bot_username.lower()):
+                ads_block_status = ChangeEnableAds()
+                if (ads_block_status == True):
+                    bot.sendMessage(chat_id, "AdBlock enabled")
+                else:
+                    bot.sendMessage(chat_id, "AdBlock disabled")
+                    
             else:
                 bot.sendMessage(chat_id, "Incorrect input")
         else:
@@ -79,6 +91,7 @@ def handle(msg):
                     bot.sendMessage(chat_id, "Successful add %s" % command[1])
                 else:
                     bot.sendMessage(chat_id, "Incorrect channel format")
+
             elif command[0] == '/del':
 
                 result = DeleteChannel(command[1])
@@ -86,6 +99,7 @@ def handle(msg):
                     bot.sendMessage(chat_id, "Successful delete %s" % command[1])
                 else:
                     bot.sendMessage(chat_id, "Channel %s allready unfollowed" % command[1])
+
     else:
         print(chat_id)
 isNotConn = True
