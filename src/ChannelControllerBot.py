@@ -43,6 +43,18 @@ def GetChannels():
 
     return list_of_channels
 
+def SetEnableAds(isEnable):
+    with open('data/ads.json', 'r') as f:
+            ads = json.load(f)
+            
+    if isEnable == True:
+        ads["enable"] = 1
+    else:
+        ads["enable"] = 0
+
+    with open('data/ads.json', 'w') as f:
+                json.dump(ads, f)
+
 def handle(msg):
     bot_username = bot.getMe()["username"]
     chat_id = msg['chat']['id']
