@@ -4,6 +4,7 @@ import json
 import telepot
 from telepot.loop import MessageLoop
 
+import SharedFunctions as sf
 import config
 
 def CheckCorrectly(channel):
@@ -15,37 +16,35 @@ def CheckCorrectly(channel):
     else: 
         return True
 
+
 def AddChannel(key):
-    with open('data/channels.json', 'r') as f:
-            channels = json.load(f)
+    channels = sf.OpenJson(name= "channels")
     channels[key] = 0 
-    with open('data/channels.json', 'w') as f:
-                json.dump(channels, f)
+    sf.SaveJson(name= "channels", data=channels)
+
 
 def DeleteChannel(key):
-    with open('data/channels.json', 'r') as f:
-            channels = json.load(f)
+    channels = sf.OpenJson(name= "channels")
     
     if key in channels:
         channels.pop(key, None)
-        with open('data/channels.json', 'w') as f:
-                    json.dump(channels, f)
+        sf.SaveJson(name= "channels", data=channels)
         return True
     else:
         return False
     
+
 def GetChannels():
-    with open('data/channels.json', 'r') as f:
-        channels = json.load(f)
+    channels = sf.OpenJson(name= "channels")
     list_of_channels = ""
     for channel in channels:
         list_of_channels = list_of_channels + str(channel) + "\n"
 
     return list_of_channels
 
+
 def ChangeEnableAds():
-    with open('data/ads.json', 'r') as f:
-            ads = json.load(f)
+    ads = sf.OpenJson(name= "ads")
 
     if ads["enable"] == 1:
         ads["enable"] = 0
@@ -54,10 +53,14 @@ def ChangeEnableAds():
         ads["enable"] = 1
         ads_block_status = True
 
-    with open('data/ads.json', 'w') as f:
-                json.dump(ads, f)
+    sf.SaveJson(name= "ads", data=ads)
 
     return ads_block_status
+
+
+#def GetAdsRuleList():
+
+
 
 def handle(msg):
     bot_username = bot.getMe()["username"]
@@ -81,7 +84,7 @@ def handle(msg):
                     bot.sendMessage(chat_id, "AdBlock enabled")
                 else:
                     bot.sendMessage(chat_id, "AdBlock disabled")
-                    
+
             else:
                 bot.sendMessage(chat_id, "Incorrect input")
         else:
@@ -102,6 +105,8 @@ def handle(msg):
 
     else:
         print(chat_id)
+
+
 isNotConn = True
 while isNotConn:
     try:
