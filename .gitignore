@@ -5,5 +5,8 @@ __pycache__/
 config.py
 
 *.session
+*.session-journal
 
 test.py
+
+*.log

@@ -9,6 +9,7 @@ import logging
 from telethon.sync import TelegramClient
 from telethon import functions, types
 
+import SharedFunctions as sf
 import config
 
 
@@ -18,15 +19,14 @@ def CheckSponsored(msg, KeyPharses):
     for Pharse in KeyPharses:
         if msg.message.lower().find(Pharse)!=-1: 
             isAd = True
-    print("Message id " + str(msg.id) + " is Sponsored " + str(isAd) )
+            logging.info("Message id " + str(msg.id) + " is Sponsored")
     if (isAd == False):
         return msg
     else: 
         return None
 
 def OpenSponsored():
-    with open('data/ads.json', 'r') as f:
-            ads = json.load(f)
+    ads = sf.OpenJson(name="ads")
     if ads["enable"]==1:
         ads_list = list()
         for ad in ads:
@@ -93,21 +93,16 @@ def GetLastMsg(client, channel_id):
 
 
 def OpenUpdateTime():
-    with open('data/channels.json', 'r') as f:
-            channels = json.load(f)
-    return channels
+    return sf.OpenJson(name= "channels")
 
 def SaveUpdateTime(key, LastMsg_id):
-    with open('data/channels.json', 'r') as f:
-            channels = json.load(f)
+    channels = sf.OpenJson(name= "channels")
     channels[key] = LastMsg_id - 1 #
-    with open('data/channels.json', 'w') as f:
-                json.dump(channels, f)
+    sf.SaveJson(name="channels", data= channels)
 
 def SaveNewTime(channels):
     print("SAVING: " + str(channels) )
-    with open('data/channels.json', 'w') as f:
-            json.dump(channels, f)
+    sf.SaveJson(name="channels", data= channels)
 
 
 
@@ -150,11 +145,11 @@ def main(client):
     
 
 if __name__ == '__main__':
-    logging.basicConfig(filename="ChannelControllerBot.log", level=logging.INFO)
+    logging.basicConfig(filename="MainClient.log", level=logging.INFO)
     api_id = config.api_id
     api_hash = config.api_hash
     isNotConnected = True
-    logging.INFO("Start")
+    logging.info("Start")
     while isNotConnected:
         try:
             client = TelegramClient('UChannel', api_id, api_hash)
