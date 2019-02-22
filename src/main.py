@@ -2,6 +2,7 @@ import datetime
 import json
 import time
 from random import randint
+import logging
 
 # These example values won't work. You must get your own api_id and
 # api_hash from https://my.telegram.org, under API Development.
@@ -117,15 +118,13 @@ def main(client):
     for channel_id in channels:
         if (channels[channel_id] == 0):
 
-            print("(0) channels: " + str(channels) )
-            print("(0) channels[channel_id]: " + str(channels[channel_id]) )
+            logging.INFO("(NEW CHANNEL) channels: " + str(channels) + " channels[channel_id]: " + str(channels[channel_id]) )
 
             LastMsg_id = GetLastMsg(client, channel_id)
             SaveUpdateTime(key = channel_id, LastMsg_id = LastMsg_id)
             channels = OpenUpdateTime()
 
-            print("(1) channels: " + str(channels) )
-            print("(1) channels[channel_id]: " + str(channels[channel_id]) )
+            logging.INFO("(DATA TO NEW CHANNEL) channels: " + str(channels) + " channels[channel_id]: " + str(channels[channel_id]))
         try:
             msg = GetHistory(client = client, min = channels[channel_id], channel_id = channel_id)
             print("(2) msg len: " + str( len(msg) ))
@@ -139,7 +138,7 @@ def main(client):
                 needSave = True
             time.sleep(randint(5, 10))
         except Exception as e:
-            print( str(e) )
+            logging.error( str(e) )
     
     if needSave:
         SaveNewTime(channels)
@@ -151,18 +150,18 @@ def main(client):
     
 
 if __name__ == '__main__':
-
+    logging.basicConfig(filename="ChannelControllerBot.log", level=logging.INFO)
     api_id = config.api_id
     api_hash = config.api_hash
     isNotConnected = True
-    print("Start login")
+    logging.INFO("Start")
     while isNotConnected:
         try:
             client = TelegramClient('UChannel', api_id, api_hash)
             client.start()
             isNotConnected = False
         except Exception as e:
-            print( str(e) )
+            logging.error( str(e) )
             time.sleep(30)
     wait = randint(5, 15)
 

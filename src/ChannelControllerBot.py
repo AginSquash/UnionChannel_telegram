@@ -1,5 +1,6 @@
 import time
 import json
+import logging
 
 import telepot
 from telepot.loop import MessageLoop
@@ -174,7 +175,7 @@ class Bot(telepot.helper.ChatHandler):
                         bot.sendMessage(chat_id, "Rule %s allready deleted" % input_text)
 
         else:
-            print(chat_id)
+            logging.info("Unverifed chat: %s" % chat_id)
 
     def on_callback_query(self, msg):
         query_id, from_id, query_data = telepot.glance(msg, flavor='callback_query')
@@ -187,6 +188,7 @@ class Bot(telepot.helper.ChatHandler):
 
 
 isNotConn = True
+logging.basicConfig(filename="ChannelControllerBot.log", level=logging.INFO)
 while isNotConn:
     try:
         bot = telepot.DelegatorBot(config.bot_token, [
@@ -197,7 +199,7 @@ while isNotConn:
         MessageLoop(bot).run_as_thread()
         isNotConn = False
     except Exception as e:
-        print(str(e))
+        logging.error(str(e))
         time.sleep(10)
 
 while 1:
