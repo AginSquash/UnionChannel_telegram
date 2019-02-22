@@ -70,10 +70,22 @@ def GetAdsRuleList():
 
     return list_of_channels
 
+
 def AddRuleToList(rule):
-    ads = sf.OpenJson("ads")
+    ads = sf.OpenJson(name="ads")
     ads[rule] = 0
-    sf.SaveJson("ads", ads)
+    sf.SaveJson(name="ads", data=ads)
+
+
+def DeleteRule(ad):
+    ads = sf.OpenJson(name="ads")
+    if ad in ads:
+        ads.pop(ad, None)
+        sf.SaveJson(name= "ads", data=ads)
+        return True
+    else:
+        return False
+
 
 def handle(msg):
     bot_username = bot.getMe()["username"]
@@ -117,8 +129,13 @@ def handle(msg):
                     AddRuleToList( command[1].lower() )
                     bot.sendMessage(chat_id, "Successful add %s" % command[1])
 
-            
+            elif command[0] == '/delrule':
 
+                result = DeleteRule(command[1])
+                if (result):
+                    bot.sendMessage(chat_id, "Successful delete %s" % command[1])
+                else:
+                    bot.sendMessage(chat_id, "Rule %s allready deleted" % command[1])
 
     else:
         print(chat_id)
@@ -130,7 +147,8 @@ while isNotConn:
         bot = telepot.Bot(config.bot_token)
         MessageLoop(bot, handle).run_as_thread()
         isNotConn = False
-    except:
+    except Exception as e:
+        print(str(e))
         time.sleep(10)
 
 while 1:
