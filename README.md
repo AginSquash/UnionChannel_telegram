@@ -8,7 +8,7 @@ This is a simple program that will combine all your channels into one, as well a
 The program through your account goes to all the channels that you have added to the `channels.json` and sends them to your personal (or not) channel.
 Subscribe to the channels in the telegrams is not required.
 
-## How to use
+## How to use?
 
 + Firstly, install all requirements with 
     >pip install -r requirements.txt
