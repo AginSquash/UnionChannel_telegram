@@ -192,7 +192,7 @@ while isNotConn:
         bot = telepot.DelegatorBot(config.bot_token, [
             include_callback_query_chat_id(
                 pave_event_space())(
-                    per_chat_id(), create_open, Bot, timeout=10000000000),
+                    per_chat_id(), create_open, Bot, timeout=10000000000), #so, it's really strange
         ])
         MessageLoop(bot).run_as_thread()
         isNotConn = False
