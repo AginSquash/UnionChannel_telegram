@@ -113,13 +113,9 @@ def main(client):
     for channel_id in channels:
         if (channels[channel_id] == 0):
 
-            logging.INFO("(NEW CHANNEL) channels: " + str(channels) + " channels[channel_id]: " + str(channels[channel_id]) )
-
             LastMsg_id = GetLastMsg(client, channel_id)
             SaveUpdateTime(key = channel_id, LastMsg_id = LastMsg_id)
             channels = OpenUpdateTime()
-
-            logging.INFO("(DATA TO NEW CHANNEL) channels: " + str(channels) + " channels[channel_id]: " + str(channels[channel_id]))
         try:
             msg = GetHistory(client = client, min = channels[channel_id], channel_id = channel_id)
             print("(2) msg len: " + str( len(msg) ))
