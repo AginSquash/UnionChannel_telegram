@@ -8,3 +8,4 @@ __pycache__/
 test.py
 
 *.log
+.DS_Store

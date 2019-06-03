@@ -122,57 +122,61 @@ class Bot(telepot.helper.ChatHandler):
         print("Msg from %s " % chat_id) #Channel id has "-". Keep it add to 
 
         if ( (config.admin_chat_id == None and config.channel_id == None) or chat_id == config.admin_chat_id or chat_id == config.channel_id):
-            command = msg['text'].lower()
+            
+            try:
+                command = msg['text'].lower()
+            except:
+                command = "NoTextHere"
 
             command = command.split(" ")
+            if (command[0][0] == "/"):
+                if ( len(command) == 1 ):
+                    if (command[0] == '/channels' or command[0] == '/channels@' + bot_username):
+                        list_of_channels = "Channels followed:\n\n" +  GetChannels()
+                        bot.sendMessage(chat_id, list_of_channels)
 
-            if ( len(command) == 1 ):
-                if (command[0] == '/channels' or command[0] == '/channels@' + bot_username):
-                    list_of_channels = "Channels followed:\n\n" +  GetChannels()
-                    bot.sendMessage(chat_id, list_of_channels)
+                    elif (command[0] == '/setads' or command[0] == '/setads@' + bot_username):
+                        ads_block_status = ChangeEnableAds(None)
+                        bot.sendMessage(chat_id, "AdBlock %s" %ads_block_status)
 
-                elif (command[0] == '/setads' or command[0] == '/setads@' + bot_username):
-                    ads_block_status = ChangeEnableAds(None)
-                    bot.sendMessage(chat_id, "AdBlock %s" %ads_block_status)
+                    elif (command[0] == '/rules' or command[0] == '/rules@' + bot_username):
+                        ads_block_list = GetAdsRuleList()
+                        bot.sendMessage(chat_id, text= "*AdBlock List*:\n\n" + ads_block_list, parse_mode="Markdown" ,reply_markup=InlineKeyboardMarkup(inline_keyboard=[[
+                        InlineKeyboardButton(text='Enable', callback_data='enable'),
+                        InlineKeyboardButton(text='Disable', callback_data='disable'),
+                            ]]))
 
-                elif (command[0] == '/rules' or command[0] == '/rules@' + bot_username):
-                    ads_block_list = GetAdsRuleList()
-                    bot.sendMessage(chat_id, text= "*AdBlock List*:\n\n" + ads_block_list, parse_mode="Markdown" ,reply_markup=InlineKeyboardMarkup(inline_keyboard=[[
-                    InlineKeyboardButton(text='Enable', callback_data='enable'),
-                    InlineKeyboardButton(text='Disable', callback_data='disable'),
-                        ]]))
-
+                    else:
+                        bot.sendMessage(chat_id, "Incorrect input")
                 else:
-                    bot.sendMessage(chat_id, "Incorrect input")
-            else:
-                if command[0] == '/add':
-                    if (CheckCorrectly( command[1]) ):
-                        AddChannel(command[1])
-                        bot.sendMessage(chat_id, "Successful add %s" % command[1])
-                    else:
-                        bot.sendMessage(chat_id, "Incorrect channel format")
+                    if command[0] == '/add':
+                        if (CheckCorrectly( command[1]) ):
+                            AddChannel(command[1])
+                            bot.sendMessage(chat_id, "Successful add %s" % command[1])
+                        else:
+                            bot.sendMessage(chat_id, "Incorrect channel format")
 
-                elif command[0] == '/del':
+                    elif command[0] == '/del':
 
-                    result = DeleteChannel(command[1])
-                    if (result):
-                        bot.sendMessage(chat_id, "Successful delete %s" % command[1])
-                    else:
-                        bot.sendMessage(chat_id, "Channel %s allready unfollowed" % command[1])
+                        result = DeleteChannel(command[1])
+                        if (result):
+                            bot.sendMessage(chat_id, "Successful delete %s" % command[1])
+                        else:
+                            bot.sendMessage(chat_id, "Channel %s allready unfollowed" % command[1])
 
-                elif command[0] == '/addrule':
+                    elif command[0] == '/addrule':
+                            input_text = CollectOtherText(command[1:len(command)])
+                            print(input_text)
+                            AddRuleToList( input_text )
+                            bot.sendMessage(chat_id, "Successful add %s" % input_text)
+
+                    elif command[0] == '/delrule':
                         input_text = CollectOtherText(command[1:len(command)])
-                        print(input_text)
-                        AddRuleToList( input_text )
-                        bot.sendMessage(chat_id, "Successful add %s" % input_text)
-
-                elif command[0] == '/delrule':
-                    input_text = CollectOtherText(command[1:len(command)])
-                    result = DeleteRule(input_text)
-                    if (result):
-                        bot.sendMessage(chat_id, "Successful delete %s" % input_text)
-                    else:
-                        bot.sendMessage(chat_id, "Rule %s allready deleted" % input_text)
+                        result = DeleteRule(input_text)
+                        if (result):
+                            bot.sendMessage(chat_id, "Successful delete %s" % input_text)
+                        else:
+                            bot.sendMessage(chat_id, "Rule %s allready deleted" % input_text)
 
         else:
             logging.info("Unverifed chat: %s" % chat_id)
