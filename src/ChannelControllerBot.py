@@ -98,8 +98,6 @@ def DeleteRule(ad):
     else:
         return False
 
-#propose_records = telepot.helper.SafeDict()
-
 def CollectOtherText(commands):
     input_text = ""
     i = 0

@@ -44,25 +44,73 @@ def OpenSponsored():
 def ForwardMsg(client, peer, msgMassive, MyChannel):
 
     KeyPharse = OpenSponsored()
-    messages = list()
+    messages_real = list()
+
     for msg in msgMassive:
         if KeyPharse != None:
             NeedToAdd = CheckSponsored(msg, KeyPharse)
             if NeedToAdd != None:
-                messages.append(msg.id)
+                messages_real.append(msg)
         else:
-            messages.append(msg.id)
+            messages_real.append(msg)
 
-    if len(messages)!=0:
-        messages.reverse()
-        client(functions.messages.ForwardMessagesRequest(
-            from_peer = peer,
-            id = messages,
-            to_peer=MyChannel,
-            with_my_score=True
-        ))
+    grouped_msg_ids = list()
+    msg_non_grupped = list()
+    last_grrouped_id = -1
+    messages_real.reverse()
+
+    for msg in messages_real:
+        if msg.grouped_id != None:
+            if msg.grouped_id == last_grrouped_id:
+                grouped_msg_ids.append(msg.id)
+            else:
+                if CheckTRUE(msg_non_grupped):
+                    SendMsg(client, peer, msg_non_grupped, MyChannel)
+                    msg_non_grupped = list()
+                if CheckTRUE(grouped_msg_ids):
+                    SendGrupped(client, peer, grouped_msg_ids, MyChannel)
+                    grouped_msg_ids = list()
+                last_grrouped_id = msg.grouped_id
+                grouped_msg_ids.append(msg.id)
+        else:
+            if CheckTRUE(grouped_msg_ids):
+                    SendGrupped(client, peer, grouped_msg_ids, MyChannel)
+                    grouped_msg_ids = list()
+            msg_non_grupped.append(msg.id)
+
+    if CheckTRUE(msg_non_grupped):
+        SendMsg(client, peer, msg_non_grupped, MyChannel)    
+
+    if CheckTRUE(grouped_msg_ids):
+        SendGrupped(client, peer, grouped_msg_ids, MyChannel)
 
     return  msgMassive[0].id 
+
+
+
+def CheckTRUE(_list):
+    if len(_list) > 0:
+        return True
+    else:
+        return False
+
+def SendMsg(client, peer, msg_non_grupped, MyChannel):
+    client(functions.messages.ForwardMessagesRequest(
+            from_peer = peer,
+            id = msg_non_grupped,
+            to_peer = MyChannel,
+            with_my_score = True
+        ))
+
+def SendGrupped(client, peer, grupped_ids, MyChannel):
+    client(functions.messages.ForwardMessagesRequest(
+            from_peer = peer,
+            id = grupped_ids,
+            to_peer = MyChannel,
+            with_my_score = True,
+            grouped = True
+        ))
+    return grupped_ids
 
 def GetHistory(client, min, channel_id):
     messages = client(functions.messages.GetHistoryRequest(
@@ -153,7 +201,7 @@ if __name__ == '__main__':
             isNotConnected = False
         except Exception as e:
             logging.error( str(e) )
-            time.sleep(30)
+            time.sleep(30)           
     wait = randint(5, 15)
 
     print("Starting in ", wait )
