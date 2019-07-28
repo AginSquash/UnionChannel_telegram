@@ -12,14 +12,13 @@ import SharedFunctions as sf
 import config
 
 def CheckCorrectly(channel):
-    if (channel.find("t.me/") == -1):
-        if (channel.find("@") == -1):
-            return False
-        else: 
-            return True
-    else: 
-        return True
-
+    channel = channel.replace("@", "https://t.me/")
+    if channel.find("https://t.me/") == -1:
+        channel = channel.replace("t.me/", "https://t.me/")
+    if channel.find("https://t.me/") == -1:
+        return "error"
+    else:
+        return channel
 
 def AddChannel(key):
     channels = sf.OpenJson(name= "channels")
@@ -122,11 +121,23 @@ class Bot(telepot.helper.ChatHandler):
         if ( (config.admin_chat_id == None and config.channel_id == None) or chat_id == config.admin_chat_id or chat_id == config.channel_id):
             
             try:
-                command = msg['text'].lower()
+                command = msg['text']
+                command = command.split(" ")
             except:
                 command = "NoTextHere"
+        if len(command)>1 and command != "NoTextHere":
+            if (command[1].find("https://t.me/joinchat/") == -1):
+                temp_list = list()
 
-            command = command.split(" ")
+                for cmd in command:
+                    temp_list.append(cmd.lower())
+
+                command = temp_list
+                temp_list = None
+            else:
+                command[0] = command[0].lower()
+
+            print(command)
             if (command[0][0] == "/"):
                 if ( len(command) == 1 ):
                     if (command[0] == '/channels' or command[0] == '/channels@' + bot_username):
@@ -148,9 +159,10 @@ class Bot(telepot.helper.ChatHandler):
                         bot.sendMessage(chat_id, "Incorrect input")
                 else:
                     if command[0] == '/add':
-                        if (CheckCorrectly( command[1]) ):
-                            AddChannel(command[1])
-                            bot.sendMessage(chat_id, "Successful add %s" % command[1])
+                        new_channel = CheckCorrectly(command[1])
+                        if (new_channel != "error" ):
+                            AddChannel(new_channel)
+                            bot.sendMessage(chat_id, "Successful add %s" % new_channel)
                         else:
                             bot.sendMessage(chat_id, "Incorrect channel format")
 

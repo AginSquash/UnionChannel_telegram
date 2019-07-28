@@ -9,3 +9,5 @@ test.py
 
 *.log
 .DS_Store
+
+src/config_n.py
