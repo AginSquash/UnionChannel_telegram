@@ -1,10 +1,9 @@
-import config_test as cn
 ###     Telegram-client side:   ###
-api_id = cn.api_id
-api_hash = cn.api_hash
-MyChannel = cn.MyChannel #link to your chat 
+api_id = 0000
+api_hash = "XXXXXXXXXXXXXXXXXXX"
+MyChannel = "XXXXXXXXXXXXXXXXXXXXXXXX" #link to your chat 
 
 ###          Bot-side:          ###
-bot_token = cn.bot_token
-admin_chat_id = cn.admin_chat_id       #Secure option
-channel_id = cn.channel_id
+bot_token = "XXXXXXXXXXXXXXXXXXXXXXXXXXXXX"
+admin_chat_id = None       #Secure option
+channel_id = None
