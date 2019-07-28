@@ -10,4 +10,4 @@ test.py
 *.log
 .DS_Store
 
-src/config_n.py
+src/config_test.py

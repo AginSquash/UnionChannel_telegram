@@ -125,19 +125,18 @@ class Bot(telepot.helper.ChatHandler):
                 command = command.split(" ")
             except:
                 command = "NoTextHere"
-        if len(command)>1 and command != "NoTextHere":
-            if (command[1].find("https://t.me/joinchat/") == -1):
-                temp_list = list()
+            if len(command)>1 and type(command) == list:
+                if (command[1].find("https://t.me/joinchat/") == -1):
+                    temp_list = list()
 
-                for cmd in command:
-                    temp_list.append(cmd.lower())
+                    for cmd in command:
+                        temp_list.append(cmd.lower())
 
-                command = temp_list
-                temp_list = None
-            else:
-                command[0] = command[0].lower()
+                    command = temp_list
+                    temp_list = None
+                else:
+                    command[0] = command[0].lower()
 
-            print(command)
             if (command[0][0] == "/"):
                 if ( len(command) == 1 ):
                     if (command[0] == '/channels' or command[0] == '/channels@' + bot_username):
