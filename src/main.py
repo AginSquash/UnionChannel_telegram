@@ -6,8 +6,10 @@ import logging
 
 # These example values won't work. You must get your own api_id and
 # api_hash from https://my.telegram.org, under API Development.
+
 from telethon.sync import TelegramClient
 from telethon import functions, types
+from telethon.tl.functions.messages import ImportChatInviteRequest
 
 import SharedFunctions as sf
 import config
@@ -15,15 +17,18 @@ import config
 
 def CheckSponsored(msg, KeyPharses):
 
-    isAd = False
-    for Pharse in KeyPharses:
-        if msg.message.lower().find(Pharse)!=-1: 
-            isAd = True
-            logging.info("Message id " + str(msg.id) + " is Sponsored")
-    if (isAd == False):
-        return msg
-    else: 
-        return None
+    try:
+        isAd = False
+        for Pharse in KeyPharses:
+            if msg.message.lower().find(Pharse)!=-1: 
+                isAd = True
+                logging.info("Message id " + str(msg.id) + " is Sponsored")
+        if (isAd == False):
+            return msg
+        else: 
+            return None
+    except:
+        msg
 
 def OpenSponsored():
     ads = sf.OpenJson(name="ads")
@@ -68,13 +73,13 @@ def ForwardMsg(client, peer, msgMassive, MyChannel):
                     SendMsg(client, peer, msg_non_grupped, MyChannel)
                     msg_non_grupped = list()
                 if CheckTRUE(grouped_msg_ids):
-                    SendGrupped(client, peer, grouped_msg_ids, MyChannel)
+                    SendGroupped(client, peer, grouped_msg_ids, MyChannel)
                     grouped_msg_ids = list()
                 last_grrouped_id = msg.grouped_id
                 grouped_msg_ids.append(msg.id)
         else:
             if CheckTRUE(grouped_msg_ids):
-                    SendGrupped(client, peer, grouped_msg_ids, MyChannel)
+                    SendGroupped(client, peer, grouped_msg_ids, MyChannel)
                     grouped_msg_ids = list()
             msg_non_grupped.append(msg.id)
 
@@ -82,7 +87,7 @@ def ForwardMsg(client, peer, msgMassive, MyChannel):
         SendMsg(client, peer, msg_non_grupped, MyChannel)    
 
     if CheckTRUE(grouped_msg_ids):
-        SendGrupped(client, peer, grouped_msg_ids, MyChannel)
+        SendGroupped(client, peer, grouped_msg_ids, MyChannel)
 
     return  msgMassive[0].id 
 
@@ -102,7 +107,7 @@ def SendMsg(client, peer, msg_non_grupped, MyChannel):
             with_my_score = True
         ))
 
-def SendGrupped(client, peer, grupped_ids, MyChannel):
+def SendGroupped(client, peer, grupped_ids, MyChannel):
     client(functions.messages.ForwardMessagesRequest(
             from_peer = peer,
             id = grupped_ids,
@@ -152,7 +157,21 @@ def SaveNewTime(channels):
     print("SAVING: " + str(channels) )
     sf.SaveJson(name="channels", data= channels)
 
+def GheckCorrectlyprivateLink(client, req):
+    try:
+        client(functions.messages.CheckChatInviteRequest(
+        hash=req
+        ))
+        return True
+    except:
+        return False
 
+def Subs2PrivateChat(client, req):
+    try:      
+        updates = client(ImportChatInviteRequest(req))
+        client.edit_folder(updates.chats, 1)
+    except:
+        print("allready subs")
 
 def main(client):
     needSave = False
@@ -160,6 +179,16 @@ def main(client):
     MyChannel = config.MyChannel
     for channel_id in channels:
         if (channels[channel_id] == 0):
+    
+            if channel_id.find("t.me/joinchat")!= -1:
+                ch = channel_id.split("/")
+                req = ch[len(ch)-1]
+                isCorrect = GheckCorrectlyprivateLink(client, req)
+                if not isCorrect:
+                    channels.pop(channel_id)
+                    print("Removing incorrect channel")
+                    break
+                Subs2PrivateChat(client, req)
 
             LastMsg_id = GetLastMsg(client, channel_id)
             SaveUpdateTime(key = channel_id, LastMsg_id = LastMsg_id)
@@ -212,5 +241,7 @@ if __name__ == '__main__':
             wait = 180 # 3 min   
             print("Waiting for ", wait )
             time.sleep(wait)
-        except:
+        except Exception as e:
+            print(str(e))
+            logging.error( str(e) )
             time.sleep(30)
