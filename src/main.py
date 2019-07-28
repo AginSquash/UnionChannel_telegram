@@ -157,10 +157,17 @@ def SaveNewTime(channels):
     print("SAVING: " + str(channels) )
     sf.SaveJson(name="channels", data= channels)
 
-def Subs2PrivateChat(client, channel_id):
-    ch = channel_id.split("/")
-    req = ch[len(ch)-1]
+def GheckCorrectlyprivateLink(client, req):
     try:
+        client(functions.messages.CheckChatInviteRequest(
+        hash=req
+        ))
+        return True
+    except:
+        return False
+
+def Subs2PrivateChat(client, req):
+    try:      
         updates = client(ImportChatInviteRequest(req))
         client.edit_folder(updates.chats, 1)
     except:
@@ -174,7 +181,14 @@ def main(client):
         if (channels[channel_id] == 0):
     
             if channel_id.find("t.me/joinchat")!= -1:
-                Subs2PrivateChat(client, channel_id)
+                ch = channel_id.split("/")
+                req = ch[len(ch)-1]
+                isCorrect = GheckCorrectlyprivateLink(client, req)
+                if not isCorrect:
+                    channels.pop(channel_id)
+                    print("Removing incorrect channel")
+                    break
+                Subs2PrivateChat(client, req)
 
             LastMsg_id = GetLastMsg(client, channel_id)
             SaveUpdateTime(key = channel_id, LastMsg_id = LastMsg_id)
@@ -229,4 +243,5 @@ if __name__ == '__main__':
             time.sleep(wait)
         except Exception as e:
             print(str(e))
+            logging.error( str(e) )
             time.sleep(30)
